@@ -15,6 +15,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { clipService, userService, type Clip } from '../services/firestore';
 import { VideoMomentCard } from '../components/VideoMomentCard';
 import { youtubeService } from '../services/youtube';
+import { contentFinder } from '../services/contentFinder';
 
 const { width, height } = Dimensions.get('window');
 
@@ -47,7 +48,7 @@ export const VideoFeedScreen: React.FC<VideoFeedProps> = ({navigation}) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   /**
-   * Load clips from Firestore
+   * Load clips from ContentFinder (multi-API source)
    */
   const loadClips = async (page: number = 1, refresh: boolean = false) => {
     try {
@@ -59,8 +60,36 @@ export const VideoFeedScreen: React.FC<VideoFeedProps> = ({navigation}) => {
         setIsLoadingMore(true);
       }
 
-      // Get clips from Firestore feed
-      const newClips = await clipService.getClipsFeed(pageSize);
+      // Get trending clips from ContentFinder (TikTok primary, YouTube fallback)
+      let newClips: Clip[] = [];
+      
+      try {
+        console.log('📡 Fetching trending clips from ContentFinder...');
+        const trendingMovieClips = await contentFinder.getTrendingClips();
+        
+        // Convert MovieClip to Clip format
+        newClips = trendingMovieClips.map((clip, idx) => ({
+          id: clip.id || `trending-${page}-${idx}`,
+          movieId: idx,
+          title: clip.title || 'Movie Moment',
+          description: clip.description || 'Amazing movie scene',
+          videoId: clip.id || '', // Use clip ID as YouTube ID placeholder
+          videoUrl: clip.url || clip.embedUrl || '',
+          thumbnailUrl: clip.thumbnailUrl || 'https://via.placeholder.com/400x600',
+          duration: clip.duration || 45,
+          source: (clip.source || 'youtube') as 'youtube' | 'tiktok' | 'custom',
+          likes: 0, // Real data would come from API
+          views: clip.views || 0,
+          createdAt: Timestamp.now(),
+          genre: ['Movie Moment'],
+        })) as Clip[];
+        
+        console.log(`✅ Loaded ${newClips.length} trending clips from ContentFinder`);
+      } catch (contentFinderError) {
+        console.warn('⚠️ ContentFinder error, falling back to Firestore:', contentFinderError);
+        // Fallback to Firestore clips
+        newClips = await clipService.getClipsFeed(pageSize);
+      }
       
       if (refresh) {
         setClips(newClips);
@@ -72,9 +101,9 @@ export const VideoFeedScreen: React.FC<VideoFeedProps> = ({navigation}) => {
 
       setCurrentPage(page);
 
-      // If no clips, generate sample data for demo
+      // If no clips from either source, generate sample data for demo
       if (newClips.length === 0 && page === 1) {
-        console.warn('No clips in database, using sample data for demo');
+        console.warn('No clips from any source, using sample data for demo');
         const sampleClips = generateSampleClips();
         setClips(sampleClips);
       }
