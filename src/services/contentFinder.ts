@@ -11,6 +11,14 @@ import axios from 'axios';
 import { youtubeService } from './youtube';
 import { streamingService } from './streaming';
 
+// TikTok API - using tiktok-api package
+let TikTokApi: any;
+try {
+  TikTokApi = require('tiktok-api');
+} catch (error) {
+  console.warn('TikTok API not available, will use fallback');
+}
+
 export interface MovieClip {
   id: string;
   source: 'tiktok' | 'youtube' | 'tmdb';
@@ -148,19 +156,86 @@ class ContentFinderService {
    */
   private async searchTikTok(movieTitle: string): Promise<MovieClip[]> {
     try {
-      // This would use tikwm or similar library
-      // For now, returning empty - will implement after design approval
-      
       console.log(`🔍 Searching TikTok for: "${movieTitle}"`);
-      
-      // TODO: Implement TikTok search
-      // const results = await tikwmClient.search({
-      //   keyword: `${movieTitle} movie scene`,
-      //   count: 10,
-      //   sortType: 'popular',
-      // });
 
-      return [];
+      if (!TikTokApi) {
+        console.warn('TikTok API not available, skipping');
+        return [];
+      }
+
+      const searchQueries = [
+        `${movieTitle} movie moment`,
+        `${movieTitle} best scene`,
+        `${movieTitle} iconic clip`,
+      ];
+
+      let allResults: any[] = [];
+
+      // Try each query until we get results
+      for (const query of searchQueries) {
+        try {
+          console.log(`  → Trying: "${query}"`);
+
+          // Search TikTok for the query
+          const response = await axios.get('https://api.tiktok.com/v1/search', {
+            params: {
+              keyword: query,
+              search_id: Date.now(),
+              offset: 0,
+              count: 10,
+              is_filter_search: 0,
+              sort_type: 1, // Sort by views
+              discover_type: 0,
+              general_search_info: '',
+            },
+            headers: {
+              'User-Agent':
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            },
+          });
+
+          const videos = response.data.video_results || [];
+
+          if (videos.length > 0) {
+            allResults = videos;
+            console.log(`  ✅ Found ${videos.length} results for "${query}"`);
+            break;
+          }
+        } catch (queryError) {
+          console.warn(`  ❌ Query failed: "${query}"`, queryError);
+          continue;
+        }
+      }
+
+      // Transform TikTok results to our format
+      const clips = allResults
+        .slice(0, 5) // Top 5 results
+        .filter(
+          video =>
+            video.video_duration &&
+            video.video_duration >= 15 &&
+            video.video_duration <= 120
+        ) // 15-120 seconds
+        .map(video => ({
+          id: video.video_id || video.aweme_id,
+          source: 'tiktok' as const,
+          title: `${movieTitle} - @${video.author?.unique_id || 'creator'}`,
+          description: video.desc || video.video_description || '',
+          url: `https://www.tiktok.com/@${video.author?.unique_id || 'unknown'}/video/${video.video_id || video.aweme_id}`,
+          embedUrl: `https://www.tiktok.com/embed/v2/${video.video_id || video.aweme_id}`,
+          thumbnailUrl:
+            video.video_cover?.image_list?.[0]?.url_list?.[0] ||
+            video.cover ||
+            '',
+          views: parseInt(video.statistics?.play_count || 0),
+          duration: video.video_duration,
+          quality: 'high' as const,
+          uploadedBy: video.author?.unique_id || 'Unknown',
+          platform: 'TikTok' as const,
+        }));
+
+      console.log(`✅ Successfully fetched ${clips.length} TikTok clips`);
+      return clips;
     } catch (error) {
       console.error('TikTok search error:', error);
       return [];
