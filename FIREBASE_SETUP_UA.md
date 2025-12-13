@@ -69,29 +69,45 @@ Your new Firebase project is ready!
 
 Тепер ви на головній сторінці Firebase Console вашого проекту.
 
-### ШАГ 5А: Знайдіть "Project Settings"
+### ШАГ 5А: Знайдіть "Project Settings" ✅ (ВИ ВУТРИ ЗНАХОДИТЕСЯ!)
 
-Шукайте в **верхньому лівому куті** логотип Firebase (вогонь 🔥).
+Ви вже отримали Project Settings! Ви бачите таку сторону-бар ліворуч:
 
-Справа від нього мають бути **два предмети:**
-- Назва вашого проекту (наприклад "fomo-app")
-- **Значок шестерні ⚙️** (Project Settings)
+```
+Project settings
+├─ General              ← ВИ ТУТЕЙСЬ!
+├─ Cloud Messaging
+├─ Integrations
+├─ Service accounts
+├─ Data privacy
+├─ Users and permissions
+├─ Alerts
+```
 
-**Натисніть на цю шестеню ⚙️**
+Це правильно! Залишайтеся на **"General"** вкладці.
 
 ---
 
 ### ШАГ 5Б: Знайдіть "Your apps"
 
-Коли відкриєте Project Settings, ви побачите ліву сторону-бар з такими розділами:
+На ЛІВІЙ СТОРОНІ (де ви бачите список пунктів), ПРОКРУТІТЬ ВНИЗ:
+
 ```
-General
-Users and permissions
-Service accounts
-Your apps          ← ВОТ ТУТ!
+Project settings
+├─ General
+├─ Cloud Messaging
+├─ Integrations
+├─ Service accounts
+├─ Data privacy
+├─ Users and permissions
+├─ Alerts
+└─ Your project
+   ├─ Project name: FomoApi
+   ├─ Project ID: fomoapi-d43d6
+   └─ Your apps              ← ВОТ СЮДИ!
 ```
 
-**Натисніть на "Your apps"**
+**Натисніть на "Your apps"** (може бути потрібно прокрутити ліву сторону-бар вниз)
 
 ---
 
