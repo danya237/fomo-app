@@ -138,6 +138,15 @@ export const VideoMomentCard: React.FC<VideoMomentCardProps> = ({
                 <Text style={styles.statText}>{clip.views}</Text>
               </View>
             </View>
+
+            {/* Watch Trailer Button */}
+            <TouchableOpacity
+              style={styles.trailerButton}
+              onPress={() => onPlayTrailer?.(clip.videoId)}
+            >
+              <Ionicons name="play-circle" size={20} color="white" style={{marginRight: 8}} />
+              <Text style={styles.trailerButtonText}>Watch Trailer</Text>
+            </TouchableOpacity>
           </View>
         </LinearGradient>
 
@@ -323,6 +332,23 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: 'bold',
     marginTop: 4,
+  },
+  trailerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(79, 172, 254, 0.9)',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(79, 172, 254, 0.5)',
+  },
+  trailerButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '600',
   },
   swipeHint: {
     position: 'absolute',

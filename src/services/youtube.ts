@@ -155,8 +155,9 @@ class YouTubeService {
   }
 
   /**
-   * Search for shorts on YouTube
-   * Searches for movie title + "scene" or "trailer" to find relevant clips
+   * Search for best movie scenes on YouTube (not trailers)
+   * Searches for "best scenes", "iconic moments", "clip compilation"
+   * Filters results to 3-15 minute videos
    */
   async searchShorts(
     movieTitle: string,
@@ -178,14 +179,14 @@ class YouTubeService {
         return [];
       }
 
-      // Build search query
+      // Build search queries for BEST SCENES (not trailers)
       const searchQueries = [
-        `${movieTitle} scene highlights`,
-        `${movieTitle} best moment`,
-        `${movieTitle} trailer clips`,
+        `${movieTitle} best scenes`,
+        `${movieTitle} iconic moments`,
+        `${movieTitle} top clips`,
       ];
 
-      console.log(`🔍 Searching YouTube for "${movieTitle}"`);
+      console.log(`🔍 Searching YouTube for best scenes: "${movieTitle}"`);
 
       // Try primary query first
       let results = await this.performSearch(
@@ -326,6 +327,57 @@ class YouTubeService {
       ? `${movieTitle} ${genre} scene`
       : `${movieTitle} highlights`;
     return this.performSearch(query, 3);
+  }
+
+  /**
+   * Search for official trailer (for "Watch Trailer" button)
+   * Searches specifically for trailers instead of scenes
+   */
+  async searchTrailer(movieTitle: string): Promise<YouTubeShort | null> {
+    try {
+      if (!this.hasQuota(SEARCH_QUOTA_PER_REQUEST)) {
+        console.warn('⚠️ YouTube API quota exceeded for trailer search');
+        return null;
+      }
+
+      console.log(`🎬 Searching for trailer: "${movieTitle}"`);
+
+      const response = await this.api.get('/search', {
+        params: {
+          q: `${movieTitle} official trailer`,
+          part: 'snippet',
+          type: 'video',
+          maxResults: 3,
+          key: YOUTUBE_API_KEY,
+          order: 'relevance',
+          safeSearch: 'moderate',
+        },
+      });
+
+      this.quotaTracker.used += SEARCH_QUOTA_PER_REQUEST;
+
+      if (response.data.items.length === 0) {
+        return null;
+      }
+
+      // Return first (most relevant) trailer
+      const item = response.data.items[0];
+      return {
+        id: item.id.videoId,
+        title: item.snippet.title,
+        description: item.snippet.description,
+        channelTitle: item.snippet.channelTitle,
+        publishedAt: item.snippet.publishedAt,
+        thumbnailUrl:
+          item.snippet.thumbnails.high?.url ||
+          item.snippet.thumbnails.medium?.url ||
+          '',
+        embeddableUrl: `https://www.youtube.com/embed/${item.id.videoId}`,
+      };
+    } catch (error) {
+      console.error('Error searching for trailer:', error);
+      return null;
+    }
   }
 }
 
