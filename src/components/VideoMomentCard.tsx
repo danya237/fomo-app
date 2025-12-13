@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Dimensions,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -22,7 +23,9 @@ interface VideoMomentCardProps {
   onShare?: (clipId: string) => void;
   onNavigateToComments?: (clipId: string) => void;
   onPlayTrailer?: (videoId: string) => void;
+  onWatchNow?: (platformUrl: string, movieTitle: string) => void;
   isLiked?: boolean;
+  streamingPlatforms?: Array<{name: string; icon: string; url: string}>;
 }
 
 /**
@@ -41,7 +44,9 @@ export const VideoMomentCard: React.FC<VideoMomentCardProps> = ({
   onShare,
   onNavigateToComments,
   onPlayTrailer,
+  onWatchNow,
   isLiked: initialIsLiked = false,
+  streamingPlatforms = [],
 }) => {
   const { colors } = useTheme();
   const { currentUser } = useAuth();
@@ -147,6 +152,28 @@ export const VideoMomentCard: React.FC<VideoMomentCardProps> = ({
               <Ionicons name="play-circle" size={20} color="white" style={{marginRight: 8}} />
               <Text style={styles.trailerButtonText}>Watch Trailer</Text>
             </TouchableOpacity>
+
+            {/* Watch Now on Streaming Platforms */}
+            {streamingPlatforms.length > 0 && (
+              <View style={styles.platformsContainer}>
+                <Text style={styles.platformsLabel}>Watch Now:</Text>
+                <View style={styles.platformsList}>
+                  {streamingPlatforms.map((platform, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      style={styles.platformBadge}
+                      onPress={() => {
+                        onWatchNow?.(platform.url, clip.title);
+                        Linking.openURL(platform.url);
+                      }}
+                    >
+                      <Text style={styles.platformIcon}>{platform.icon}</Text>
+                      <Text style={styles.platformName}>{platform.name}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            )}
           </View>
         </LinearGradient>
 
@@ -348,6 +375,40 @@ const styles = StyleSheet.create({
   trailerButtonText: {
     color: 'white',
     fontSize: 14,
+    fontWeight: '600',
+  },
+  platformsContainer: {
+    marginTop: 12,
+  },
+  platformsLabel: {
+    color: '#adb5bd',
+    fontSize: 12,
+    fontWeight: '600',
+    marginBottom: 8,
+    textTransform: 'uppercase',
+  },
+  platformsList: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  platformBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(79, 172, 254, 0.8)',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(79, 172, 254, 0.5)',
+  },
+  platformIcon: {
+    fontSize: 16,
+    marginRight: 6,
+  },
+  platformName: {
+    color: 'white',
+    fontSize: 12,
     fontWeight: '600',
   },
   swipeHint: {
