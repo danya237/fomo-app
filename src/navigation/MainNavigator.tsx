@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
-import { HomeScreen } from '../screens/HomeScreen';
+import { VideoFeedScreen } from '../screens/VideoFeedScreen';
 import { LikedScreen } from '../screens/LikedScreen';
 import { FriendsScreen } from '../screens/FriendsScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
@@ -58,7 +58,7 @@ export const MainNavigator = () => {
     >
       <Tab.Screen
         name="Home"
-        component={HomeScreen}
+        component={VideoFeedScreen}
         options={{
           title: t('tabs.home'),
           headerShown: false,
