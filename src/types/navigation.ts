@@ -1,6 +1,11 @@
 import type { Movie } from './movie';
 
 export type RootStackParamList = {
+  // Auth screens (only when not authenticated)
+  Login: undefined;
+  Signup: undefined;
+  
+  // Main app screens (only when authenticated)
   MainTabs: undefined;
   MovieDetails: { movie: Movie };
   Stats: undefined;

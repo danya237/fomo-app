@@ -1,0 +1,146 @@
+// FOMO v2.0 Firestore Security Rules
+// Deploy with: firebase deploy --only firestore:rules
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isUser(uid) {
+      return request.auth.uid == uid;
+    }
+    
+    function isUserProfile() {
+      return isUser(resource.data.uid);
+    }
+    
+    // ===== USERS COLLECTION =====
+    // User profiles: users/{uid}
+    match /users/{uid} {
+      // Anyone can read public user profiles
+      allow read: if isAuthenticated();
+      
+      // Users can only write their own profile
+      allow create: if isAuthenticated() && isUser(uid);
+      allow update: if isAuthenticated() && isUser(uid);
+      allow delete: if isAuthenticated() && isUser(uid);
+      
+      // Subcollection: liked clips
+      match /likedClips/{clipId} {
+        allow read: if isAuthenticated() && isUser(uid);
+        allow write: if isAuthenticated() && isUser(uid);
+      }
+      
+      // Subcollection: watched clips
+      match /watchedClips/{clipId} {
+        allow read: if isAuthenticated() && isUser(uid);
+        allow write: if isAuthenticated() && isUser(uid);
+      }
+    }
+    
+    // ===== CLIPS COLLECTION =====
+    // Short video moments: clips/{clipId}
+    match /clips/{clipId} {
+      // Everyone can read clips
+      allow read: if isAuthenticated();
+      
+      // Only server (via Cloud Functions) can create/update/delete
+      // or app can create via trigger
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (
+        // User can like/unlike (increment likes)
+        request.resource.data.likes == resource.data.likes + 1 ||
+        request.resource.data.likes == resource.data.likes - 1 ||
+        // User can update views
+        request.resource.data.views == resource.data.views + 1
+      );
+      allow delete: if false; // Clips are never deleted, only archived
+      
+      // Subcollection: comments
+      match /comments/{commentId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+        allow update: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+        allow delete: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      }
+      
+      // Subcollection: reactions (emojis)
+      match /reactions/{reactionId} {
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated();
+      }
+    }
+    
+    // ===== WATCH PARTIES COLLECTION =====
+    // Group watch rooms: watchParties/{roomId}
+    match /watchParties/{roomId} {
+      // Allow read if user is member
+      allow read: if isAuthenticated() && (
+        request.auth.uid in resource.data.members ||
+        resource.data.isPublic == true
+      );
+      
+      // Creator can create room
+      allow create: if isAuthenticated() && request.resource.data.creatorId == request.auth.uid;
+      
+      // Creator or members can update
+      allow update: if isAuthenticated() && (
+        resource.data.creatorId == request.auth.uid ||
+        request.auth.uid in resource.data.members
+      );
+      
+      // Only creator can delete
+      allow delete: if isAuthenticated() && resource.data.creatorId == request.auth.uid;
+      
+      // Subcollection: messages
+      match /messages/{messageId} {
+        allow read: if isAuthenticated() && (
+          request.auth.uid in get(/databases/$(database)/documents/watchParties/$(roomId)).data.members ||
+          get(/databases/$(database)/documents/watchParties/$(roomId)).data.isPublic == true
+        );
+        
+        allow create: if isAuthenticated() && 
+          request.auth.uid in get(/databases/$(database)/documents/watchParties/$(roomId)).data.members &&
+          request.resource.data.userId == request.auth.uid;
+        
+        allow update, delete: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      }
+    }
+    
+    // ===== FRIEND REQUESTS COLLECTION =====
+    // Friend requests: friendRequests/{requestId}
+    match /friendRequests/{requestId} {
+      // User can read requests sent to them or by them
+      allow read: if isAuthenticated() && (
+        resource.data.fromId == request.auth.uid ||
+        resource.data.toId == request.auth.uid
+      );
+      
+      // User can create request
+      allow create: if isAuthenticated() && request.resource.data.fromId == request.auth.uid;
+      
+      // Receiver can accept/decline
+      allow update: if isAuthenticated() && resource.data.toId == request.auth.uid;
+      
+      // Creator can delete
+      allow delete: if isAuthenticated() && resource.data.fromId == request.auth.uid;
+    }
+    
+    // ===== NOTIFICATIONS COLLECTION =====
+    // User notifications: notifications/{userId}/userNotifications/{notificationId}
+    match /notifications/{userId}/userNotifications/{notificationId} {
+      allow read: if isAuthenticated() && isUser(userId);
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && isUser(userId);
+    }
+    
+    // Default: deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
