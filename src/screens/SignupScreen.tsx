@@ -10,12 +10,14 @@ import {
   StyleSheet,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 
 export const SignupScreen: React.FC<{navigation: any}> = ({navigation}) => {
   const { colors } = useTheme();
   const { signup, isLoading } = useAuth();
+  const { t } = useTranslation();
 
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
@@ -45,7 +47,7 @@ export const SignupScreen: React.FC<{navigation: any}> = ({navigation}) => {
     try {
       setError('');
       await signup(email, password, displayName);
-      Alert.alert('Success', 'Account created! Welcome to FOMO 🎉');
+      Alert.alert(t('common.success'), t('auth.accountCreated') || 'Account created! Welcome to FOMO 🎉');
       // Navigation happens automatically via AuthContext listener
     } catch (err: any) {
       const errorCode = err.code || 'unknown';
@@ -57,7 +59,7 @@ export const SignupScreen: React.FC<{navigation: any}> = ({navigation}) => {
       };
       const message = errorMessages[errorCode] || err.message;
       setError(message);
-      Alert.alert('Signup Failed', message);
+      Alert.alert(t('auth.signupFailed'), message);
     }
   };
 

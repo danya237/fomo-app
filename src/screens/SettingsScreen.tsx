@@ -85,7 +85,7 @@ export const SettingsScreen = () => {
   const handleLogout = () => {
     Alert.alert(
       t('settings.logout'),
-      'Це видалить всі ваші лайки та дизлайки. Продовжити?',
+      t('settings.logoutConfirmation') || 'This will delete all your likes and dislikes. Continue?',
       [
         {
           text: t('common.cancel'),
@@ -97,9 +97,9 @@ export const SettingsScreen = () => {
           onPress: async () => {
             try {
               await Promise.all([clearAllLikes(), clearAllDislikes()]);
-              Alert.alert('✅', 'Дані успішно очищені!');
+              Alert.alert('✅', t('settings.dataCleared'));
             } catch (error) {
-              Alert.alert('❌', 'Помилка при очищенні даних');
+              Alert.alert('❌', t('settings.clearError'));
             }
           },
         },

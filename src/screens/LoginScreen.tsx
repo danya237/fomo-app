@@ -47,12 +47,12 @@ export const LoginScreen: React.FC<{navigation: any}> = ({navigation}) => {
         'auth/too-many-requests': 'Too many failed login attempts. Try again later.',
       };
       setError(errorMessages[errorCode] || err.message);
-      Alert.alert('Login Failed', errorMessages[errorCode] || err.message);
+      Alert.alert(t('auth.loginFailed'), errorMessages[errorCode] || err.message);
     }
   };
 
   const handleGoogleSignIn = async () => {
-    Alert.alert('Coming Soon', 'Google Sign-In will be available in the next update');
+    Alert.alert(t('common.comingSoon'), t('auth.googleComingSoon') || 'Google Sign-In will be available in the next update');
   };
 
   return (

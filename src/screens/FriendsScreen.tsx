@@ -55,21 +55,21 @@ export const FriendsScreen = () => {
 
   const handleAddFriend = () => {
     Alert.alert(
-      '➕ Add Friend',
-      'Enter friend\'s username or email',
+      '➕ ' + t('friends.addFriend'),
+      t('friends.enterUsername') || 'Enter friend\'s username or email',
       [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Add', onPress: () => Alert.alert('✅', 'Friend request sent!') },
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('common.add'), onPress: () => Alert.alert('✅', t('friends.requestSent')) },
       ]
     );
   };
 
   const handleRemoveFriend = (friendId: string) => {
     Alert.alert(
-      '🗑️ Remove Friend',
-      'Are you sure?',
+      '🗑️ ' + t('common.delete'),
+      t('friends.removeConfirmation') || 'Are you sure?',
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
           text: 'Remove',
           style: 'destructive',
@@ -179,7 +179,7 @@ export const FriendsScreen = () => {
               <View style={styles.friendActions}>
                 <TouchableOpacity
                   style={[styles.actionButton, { backgroundColor: colors.primary + '20' }]}
-                  onPress={() => Alert.alert('🎬', `See ${friend.name}'s movies`)}
+                  onPress={() => Alert.alert('🎬', t('friends.seeMovies'))}
                 >
                   <Ionicons name="film" size={18} color={colors.primary} />
                 </TouchableOpacity>

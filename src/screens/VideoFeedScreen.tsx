@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Timestamp } from 'firebase/firestore';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { clipService, userService, type Clip } from '../services/firestore';
@@ -37,6 +38,7 @@ interface VideoFeedProps {
 export const VideoFeedScreen: React.FC<VideoFeedProps> = ({navigation}) => {
   const { colors } = useTheme();
   const { currentUser } = useAuth();
+  const { t } = useTranslation();
   const [clips, setClips] = useState<Clip[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -111,7 +113,7 @@ export const VideoFeedScreen: React.FC<VideoFeedProps> = ({navigation}) => {
       console.log(`✅ Loaded ${newClips.length} clips (page ${page})`);
     } catch (error) {
       console.error('Error loading clips:', error);
-      Alert.alert('Error', 'Failed to load videos');
+      Alert.alert(t('common.error'), t('video.errorLoading'));
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -190,7 +192,7 @@ export const VideoFeedScreen: React.FC<VideoFeedProps> = ({navigation}) => {
   const handleComment = (clipId: string) => {
     console.log('Comment on clip:', clipId);
     // TODO: Navigate to comments screen
-    Alert.alert('Coming Soon', 'Comments feature coming in next update');
+    Alert.alert(t('common.comingSoon'), t('video.commentsComingSoon') || 'Comments feature coming in next update');
   };
 
   /**
@@ -198,7 +200,7 @@ export const VideoFeedScreen: React.FC<VideoFeedProps> = ({navigation}) => {
    */
   const handleShare = (clipId: string) => {
     console.log('Share clip:', clipId);
-    Alert.alert('Share', 'Share feature coming soon');
+    Alert.alert(t('common.share'), t('video.shareComingSoon') || 'Share feature coming soon');
   };
 
   /**
@@ -213,7 +215,7 @@ export const VideoFeedScreen: React.FC<VideoFeedProps> = ({navigation}) => {
       onShare={() => handleShare(item.id)}
       onNavigateToComments={() => {
         // TODO: Create CommentsScreen
-        Alert.alert('Coming Soon', 'Comments screen coming in next update');
+        Alert.alert(t('common.comingSoon'), t('video.commentsComingSoon') || 'Comments screen coming in next update');
       }}
       onPlayTrailer={(videoId) => {
         navigation.navigate('VideoPlayer', {videoKey: videoId});

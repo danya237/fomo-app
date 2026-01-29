@@ -52,17 +52,17 @@ export const ProfileScreen = () => {
     try {
       const profile: UserProfile = { username, email, password };
       await AsyncStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
-      Alert.alert('✅ ' + t('common.success'), 'Профіль збережено!');
+      Alert.alert('✅ ' + t('common.success'), t('profile.profileUpdated'));
     } catch (error) {
       console.error('Error saving profile:', error);
-      Alert.alert('❌ ' + t('common.error'), 'Помилка збереження профілю');
+      Alert.alert('❌ ' + t('common.error'), t('profile.updateFailed'));
     }
   };
 
   const handleLogout = () => {
     Alert.alert(
       t('settings.logout'),
-      'Це видалить всі ваші дані (лайки, дизлайки, профіль). Продовжити?',
+      t('settings.logoutConfirmation') || 'This will delete all your data (likes, dislikes, profile). Continue?',
       [
         {
           text: t('common.cancel'),
@@ -81,9 +81,9 @@ export const ProfileScreen = () => {
               setUsername('');
               setEmail('');
               setPassword('');
-              Alert.alert('✅', 'Всі дані успішно видалені!');
+              Alert.alert('✅', t('settings.dataCleared'));
             } catch (error) {
-              Alert.alert('❌', 'Помилка при видаленні даних');
+              Alert.alert('❌', t('settings.clearError'));
             }
           },
         },
