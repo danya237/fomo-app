@@ -322,13 +322,13 @@ export const SettingsScreen = () => {
           Find Outstanding Movie Options
         </Text>
         <Text style={[styles.footerVersion, { color: colors.textSecondary }]}>
-          v1.0.0 • © 2025
+          v2.0.0 • © 2025
         </Text>
         <Text style={[styles.footerCredit, { color: colors.textSecondary }]}>
           Made with ❤️ by passionate developers
         </Text>
         <Text style={[styles.footerApi, { color: colors.textSecondary }]}>
-          Powered by TMDb API
+          Powered by TMDb & YouTube API
         </Text>
       </View>
     </ScrollView>
