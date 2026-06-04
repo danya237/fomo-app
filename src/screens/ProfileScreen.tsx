@@ -162,7 +162,7 @@ export const ProfileScreen = () => {
           onPress={saveProfile}
         >
           <Ionicons name="checkmark-circle" size={20} color="white" />
-          <Text style={styles.saveButtonText}>Зберегти профіль</Text>
+          <Text style={styles.saveButtonText}>{t('profile.saveChanges')}</Text>
         </TouchableOpacity>
 
         {/* Logout Button */}

@@ -1,0 +1,13 @@
+[debug] [2026-06-02T13:10:16.025Z] ----------------------------------------------------------------------
+[debug] [2026-06-02T13:10:16.028Z] Command:       /usr/local/bin/node /Users/daraa042/прога апкавже/MovieSwipe/node_modules/.bin/firebase login --no-localhost
+[debug] [2026-06-02T13:10:16.028Z] CLI Version:   15.19.0
+[debug] [2026-06-02T13:10:16.028Z] Platform:      darwin
+[debug] [2026-06-02T13:10:16.028Z] Node Version:  v24.11.1
+[debug] [2026-06-02T13:10:16.028Z] Time:          Tue Jun 02 2026 15:10:16 GMT+0200 (Central European Summer Time)
+[debug] [2026-06-02T13:10:16.028Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-06-02T13:10:16.030Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[info] i  The Firebase CLI’s MCP server feature can optionally make use of Gemini in Firebase. Learn more about Gemini in Firebase and how it uses your data: https://firebase.google.com/docs/gemini-in-firebase#how-gemini-in-firebase-uses-your-data 
+[debug] [2026-06-02T13:10:16.248Z] *** [apiv2] error from fetch(https://firebase-public.firebaseio.com/cli.json, {"headers":{},"method":"GET"}): FetchError: request to https://firebase-public.firebaseio.com/cli.json failed, reason: self-signed certificate in certificate chain
+[warn] ⚠  Unable to fetch the CLI MOTD and remote config. This is not a fatal error, but may indicate an issue with your network connection. 
+[debug] [2026-06-02T13:10:16.248Z] Failed to fetch MOTD FirebaseError: Failed to make request to https://firebase-public.firebaseio.com/cli.json
