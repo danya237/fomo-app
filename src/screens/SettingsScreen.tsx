@@ -287,10 +287,10 @@ export const SettingsScreen = () => {
         <SettingItem
           icon="information-circle"
           title="About FOMO"
-          subtitle="v1.0.0 • Learn more"
+          subtitle="v2.0.0 • Learn more"
           onPress={() => Alert.alert(
             '🎬 FOMO',
-            'Find Outstanding Movie Options\n\nVersion 1.0.0\n\n✨ Features:\n• Swipe interface for movie discovery\n• AI-powered recommendations\n• Multi-language support (UA, EN, NO)\n• Dark/Light themes\n• Movie details with cast & reviews\n\n❤️ Made with passion for movie lovers\n\n© 2025 FOMO\nPowered by TMDb API'
+            'Find Outstanding Movie Options\n\nVersion 2.0.0\n\n✨ Features:\n• TikTok-style video feed\n• AI-powered movie recommendations\n• Multi-language support (UA, EN, NO, DE, ES, IT)\n• Dark/Light themes\n• Movie details with cast & reviews\n• Friends & social features\n\n❤️ Made with passion for movie lovers\n\n© 2025 FOMO\nPowered by TMDb & YouTube API'
           )}
         />
       </View>
