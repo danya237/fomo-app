@@ -272,7 +272,11 @@ export const VideoFeedScreen: React.FC<VideoFeedProps> = ({navigation}) => {
         data={clips}
         renderItem={renderClip}
         keyExtractor={(item) => item.id}
-        pagingEnabled
+        pagingEnabled={false}
+        snapToInterval={height}
+        snapToAlignment="start"
+        decelerationRate="fast"
+        disableIntervalMomentum={true}
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
         onEndReached={handleEndReached}
@@ -280,8 +284,11 @@ export const VideoFeedScreen: React.FC<VideoFeedProps> = ({navigation}) => {
         ListFooterComponent={renderFooter}
         refreshing={isRefreshing}
         onRefresh={handleRefresh}
-        snapToAlignment="start"
-        decelerationRate="fast"
+        getItemLayout={(_, index) => ({
+          length: height,
+          offset: height * index,
+          index,
+        })}
       />
     </View>
   );
